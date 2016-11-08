@@ -10,7 +10,23 @@ Options:
 from docopt import docopt
 from gpggen import createkey, keeper, outdir
 import os
+import signal
+import sys
 
+
+def sigint(signal, frame):
+    """sigint handler for SIGINT to do cleanup.
+    Args:
+        signal: The signal number being called with.
+        frame: The current stack frame.
+    Returns:
+        None
+    Side Effect:
+        Removal of the temporary outputs, X.pub, and X.sec.
+    """
+    os.remove('X.pub')
+    os.remove('X.sec')
+    sys.exit(0)
 
 def cli():
     """Arg parser for cli.
@@ -21,7 +37,7 @@ def cli():
     Raises:
         None
     """
-    args = docopt(__doc__, version='GPG Gen Utility 0.0.1.a1')
+    args = docopt(__doc__, version='GPG Gen Utility 0.0.2.a1')
     main(args)
 
 
@@ -35,6 +51,7 @@ def main(args):
     Raises:
         None
     """
+    signal.signal(signal.SIGINT, sigint)
     while True:
         name = createkey()
         print('.', end='', flush=True)

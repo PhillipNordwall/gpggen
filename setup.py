@@ -11,7 +11,7 @@ with codecs.open(os.path.join(here, 'README.rst'), encoding='UTF-8') as f:
 
 setuptools.setup(
     name='gpggen',
-    version='0.0.1a1',
+    version='0.0.2a1',
     description='Generate GPG keys and save ones that contain words in a list'
     'of hex words.',
     long_description='',
