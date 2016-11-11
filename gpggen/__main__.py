@@ -28,6 +28,7 @@ def sigint(signal, frame):
     os.remove('X.sec')
     sys.exit(0)
 
+
 def cli():
     """Arg parser for cli.
     Args:
