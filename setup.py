@@ -1,13 +1,19 @@
 """The setup for GPG Gen"""
 
-import setuptools
 import codecs
 import os
+import re
+import setuptools
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 with codecs.open(os.path.join(here, 'README.rst'), encoding='UTF-8') as f:
     long_description = f.read()
+
+with open("gpggen/__main__.py") as f:
+    main = f.read()
+fullver = re.findall('version=\'([^\']*)\'', main)[0]
+vernum = fullver.split(' ')[-1]
 
 setuptools.setup(
     name='gpggen',

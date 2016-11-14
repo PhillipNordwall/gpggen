@@ -1,5 +1,8 @@
+import os
 import re
+import signal
 import subprocess
+import sys
 
 outdir = b"out"
 
@@ -65,3 +68,38 @@ def keeper(s):
     if a:
         return True
     return False
+
+
+def sigint(signal, frame):
+    """sigint handler for SIGINT to do cleanup.
+    Args:
+        signal: The signal number being called with.
+        frame: The current stack frame.
+    Returns:
+        None
+    Side Effect:
+        Removal of the temporary outputs, X.pub, and X.sec.
+    """
+    os.remove('X.pub')
+    os.remove('X.sec')
+    sys.exit(0)
+
+
+def main(args):
+    """Program entry point.
+    This takes the arguments and performs the encryption.
+    Args:
+        args: The dictionary of arguments parsed by docopt
+    Returns:
+        None
+    Raises:
+        None
+    """
+    signal.signal(signal.SIGINT, sigint)
+    while True:
+        name = createkey()
+        print('.', end='', flush=True)
+        if keeper(name):
+            print(name)
+            os.rename('X.pub', outdir + b'/' + name + b'.pub')
+            os.rename('X.sec', outdir + b'/' + name + b'.sec')
