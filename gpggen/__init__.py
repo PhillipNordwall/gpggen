@@ -1,19 +1,23 @@
+"""gpggen provides the capability of calling out to gpg to generate keys, and
+check for a matching hex "word"
+"""
 import os
 import re
 import signal
 import subprocess
 import sys
 
-outdir = b"out"
 
-words = (b'BAD', b'DAD',
+OUTDIR = b"out"
+
+WORDS = (b'BAD', b'DAD',
          b'DEAD', b'BEEF', b'FACE', b'1337', b'1234',
          b'([BDF])00\1', b'FB5D', b'2600', b'BE[AE]D'
          b'F00D', b'CAFE', b'DEAF', b'BABE', b'C0DE',
          b'[01]{5,}', b'ABCDEF',
          b'0FF1CE', b'C0FFEE', b'BADDAD', b'(.)\1{4,}',
          b'ABACABA')
-rwords = re.compile(b'|'.join(words))
+RWORDS = re.compile(b'|'.join(WORDS))
 
 
 def newname(gpgout):
@@ -49,31 +53,31 @@ def createkey():
     """
     subprocess.run("gpg --batch --gen-key gpginp".split(" "),
                    stderr=subprocess.DEVNULL)
-    p = subprocess.run("gpg --with-fingerprint X.pub".split(" "),
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE)
-    return newname(p.stdout)
+    proc = subprocess.run("gpg --with-fingerprint X.pub".split(" "),
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+    return newname(proc.stdout)
 
 
-def keeper(s):
-    """keeper returns a true when a substring of s is in the words list.
+def keeper(string):
+    """keeper returns a true when a substring of s is in the WORDS list.
     Args:
-        s : The string to check against.
+        string : The string to check against.
     Returns:
-        True if there is a substring in 'words' that is in s, else false.
+        True if there is a substring in 'WORDS' that is in s, else false.
     Raises:
         None
     """
-    a = rwords.findall(s)
-    if a:
+    words = RWORDS.findallt(string)
+    if words:
         return True
     return False
 
 
-def sigint(signal, frame):
+def sigint(sig, frame):
     """sigint handler for SIGINT to do cleanup.
     Args:
-        signal: The signal number being called with.
+        sig The signal number being called with.
         frame: The current stack frame.
     Returns:
         None
@@ -101,5 +105,5 @@ def main(args):
         print('.', end='', flush=True)
         if keeper(name):
             print(name)
-            os.rename('X.pub', outdir + b'/' + name + b'.pub')
-            os.rename('X.sec', outdir + b'/' + name + b'.sec')
+            os.rename('X.pub', OUTDIR + b'/' + name + b'.pub')
+            os.rename('X.sec', OUTDIR + b'/' + name + b'.sec')
